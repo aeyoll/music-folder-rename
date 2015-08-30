@@ -33,6 +33,17 @@ func getFolderFiles (d *os.File) []os.FileInfo {
   return files
 }
 
+func openFile (folder string, file os.FileInfo) *os.File {
+  f, err := os.Open(folder + "/" + file.Name())
+
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  return f
+}
+
 func getNewFileName (m tag.Metadata) (string, error) {
   artist := m.AlbumArtist()
 
@@ -75,12 +86,7 @@ func main () {
 
     for _, file := range files {
       if file.Mode().IsRegular() && filepath.Ext(file.Name()) == ".mp3" {
-        var f, err = os.Open(folder + "/" + file.Name())
-
-        if err != nil {
-          log.Fatal(err)
-        }
-
+        f := openFile(folder, file)
         defer f.Close()
 
         m, err := tag.ReadFrom(f)
