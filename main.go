@@ -11,7 +11,20 @@ import (
   color "github.com/fatih/color"
 )
 
-func getNewFileName(m tag.Metadata) (string, error) {
+func openFolder (folder string) *os.File {
+  d, err := os.Open(folder)
+
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  defer d.Close()
+
+  return d
+}
+
+func getNewFileName (m tag.Metadata) (string, error) {
   artist := m.AlbumArtist()
 
   if artist == "" {
@@ -46,14 +59,7 @@ func main () {
   red := color.New(color.FgRed).SprintFunc()
 
   for _,folder := range folders {
-    d, err := os.Open(folder)
-
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
-
-    defer d.Close()
+    d := openFolder(folder);
 
     files, err := d.Readdir(-1)
     if err != nil {
