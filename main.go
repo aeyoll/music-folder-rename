@@ -11,6 +11,7 @@ import (
   color "github.com/fatih/color"
 )
 
+// Open a folder
 func openFolder (folder string) *os.File {
   d, err := os.Open(folder)
 
@@ -22,6 +23,7 @@ func openFolder (folder string) *os.File {
   return d
 }
 
+// Get the folder files
 func getFolderFiles (d *os.File) []os.FileInfo {
   files, err := d.Readdir(-1)
 
@@ -33,10 +35,12 @@ func getFolderFiles (d *os.File) []os.FileInfo {
   return files
 }
 
+// Test if the current file is a MP3
 func isMP3File (file os.FileInfo) bool {
   return file.Mode().IsRegular() && filepath.Ext(file.Name()) == ".mp3"
 }
 
+// Open a file
 func openFile (folder string, file os.FileInfo) *os.File {
   f, err := os.Open(folder + "/" + file.Name())
 
@@ -48,6 +52,7 @@ func openFile (folder string, file os.FileInfo) *os.File {
   return f
 }
 
+// Get the metadatas of a file
 func getMetadatas (f *os.File) tag.Metadata {
   m, err := tag.ReadFrom(f)
 
@@ -58,7 +63,8 @@ func getMetadatas (f *os.File) tag.Metadata {
   return m
 }
 
-func getNewFileName (m tag.Metadata) (string, error) {
+// Get the new folder name
+func getNewFolderName (m tag.Metadata) (string, error) {
   artist := m.AlbumArtist()
 
   if artist == "" {
@@ -105,7 +111,7 @@ func main () {
 
         m := getMetadatas(f)
 
-        newFolderName, err := getNewFileName(m)
+        newFolderName, err := getNewFolderName(m)
 
         fmt.Printf("Renaming \"" + folder + "\" ")
 
