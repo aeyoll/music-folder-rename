@@ -4,13 +4,14 @@ import (
   "fmt"
   "os"
   "log"
+  "errors"
   "strconv"
   "path/filepath"
   tag "github.com/dhowden/tag"
   color "github.com/fatih/color"
 )
 
-func getNewFileName(m tag.Metadata) string {
+func getNewFileName(m tag.Metadata) (string, error) {
   artist := m.AlbumArtist()
 
   if artist == "" {
@@ -20,9 +21,21 @@ func getNewFileName(m tag.Metadata) string {
   year := strconv.Itoa(m.Year())
   album := m.Album()
 
+  if (len(artist) == 0) {
+    return "", errors.New("Artist not found")
+  }
+
+  if (year == "0") {
+    return "", errors.New("Year not found")
+  }
+
+  if (len(album) == 0) {
+    return "", errors.New("Album not found")
+  }
+
   folder := artist + " - " + year + " - " + album
 
-  return folder
+  return folder, nil
 }
 
 func main () {
@@ -30,6 +43,7 @@ func main () {
   folders := os.Args[1:]
 
   green := color.New(color.FgGreen).SprintFunc()
+  red := color.New(color.FgRed).SprintFunc()
 
   for _,folder := range folders {
     d, err := os.Open(folder)
@@ -63,11 +77,16 @@ func main () {
           log.Fatal(err)
         }
 
-        var newFolderName = getNewFileName(m)
-        fmt.Printf("Renaming \"" + folder + "\" to \"" + newFolderName + "\" ... ")
-        fmt.Printf("%s\n", green("Success ✔"))
+        newFolderName, err := getNewFileName(m)
 
-        os.Rename(folder, newFolderName)
+        fmt.Printf("Renaming \"" + folder + "\" ")
+
+        if err != nil {
+          fmt.Printf("%s\n", red("Error: " + err.Error()))
+        } else {
+          os.Rename(folder, newFolderName)
+          fmt.Printf("%s\n", green("Success ✔"))
+        }
 
         break
       }
