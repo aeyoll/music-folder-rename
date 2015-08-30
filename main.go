@@ -10,20 +10,15 @@ import (
 )
 
 func getNewFileName(m tag.Metadata) string {
-  // Artist
   artist := m.AlbumArtist()
 
   if artist == "" {
     artist = m.Artist()
   }
 
-  // Year
   year := strconv.Itoa(m.Year())
-
-  // Album
   album := m.Album()
 
-  // New folder
   folder := artist + " - " + year + " - " + album
 
   return folder
@@ -50,29 +45,27 @@ func main () {
     }
 
     for _, file := range files {
-      if file.Mode().IsRegular() {
-        if filepath.Ext(file.Name()) == ".mp3" {
-          var f, err = os.Open(folder + "/" + file.Name())
+      if file.Mode().IsRegular() && filepath.Ext(file.Name()) == ".mp3" {
+        var f, err = os.Open(folder + "/" + file.Name())
 
-          if err != nil {
-            log.Fatal(err)
-          }
-
-          defer f.Close()
-
-          m, err := tag.ReadFrom(f)
-
-          if err != nil {
-            log.Fatal(err)
-          }
-
-          var newFolderName = getNewFileName(m)
-          fmt.Println(newFolderName);
-
-          os.Rename(folder, newFolderName)
-
-          break
+        if err != nil {
+          log.Fatal(err)
         }
+
+        defer f.Close()
+
+        m, err := tag.ReadFrom(f)
+
+        if err != nil {
+          log.Fatal(err)
+        }
+
+        var newFolderName = getNewFileName(m)
+        fmt.Println(newFolderName);
+
+        os.Rename(folder, newFolderName)
+
+        break
       }
     }
   }
