@@ -19,8 +19,6 @@ func openFolder (folder string) *os.File {
     os.Exit(1)
   }
 
-  defer d.Close()
-
   return d
 }
 
@@ -60,6 +58,8 @@ func main () {
 
   for _,folder := range folders {
     d := openFolder(folder);
+
+    defer d.Close()
 
     files, err := d.Readdir(-1)
     if err != nil {
