@@ -22,6 +22,17 @@ func openFolder (folder string) *os.File {
   return d
 }
 
+func getFolderFiles (d *os.File) []os.FileInfo {
+  files, err := d.Readdir(-1)
+
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  return files
+}
+
 func getNewFileName (m tag.Metadata) (string, error) {
   artist := m.AlbumArtist()
 
@@ -57,15 +68,10 @@ func main () {
   red := color.New(color.FgRed).SprintFunc()
 
   for _,folder := range folders {
-    d := openFolder(folder);
-
+    d := openFolder(folder)
     defer d.Close()
 
-    files, err := d.Readdir(-1)
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
+    files := getFolderFiles(d)
 
     for _, file := range files {
       if file.Mode().IsRegular() && filepath.Ext(file.Name()) == ".mp3" {
