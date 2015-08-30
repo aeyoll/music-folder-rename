@@ -7,6 +7,7 @@ import (
   "strconv"
   "path/filepath"
   tag "github.com/dhowden/tag"
+  color "github.com/fatih/color"
 )
 
 func getNewFileName(m tag.Metadata) string {
@@ -27,6 +28,8 @@ func getNewFileName(m tag.Metadata) string {
 func main () {
   // Get the folders passed as arguments
   folders := os.Args[1:]
+
+  green := color.New(color.FgGreen).SprintFunc()
 
   for _,folder := range folders {
     d, err := os.Open(folder)
@@ -61,7 +64,8 @@ func main () {
         }
 
         var newFolderName = getNewFileName(m)
-        fmt.Println(newFolderName);
+        fmt.Printf("Renaming \"" + folder + "\" to \"" + newFolderName + "\" ... ")
+        fmt.Printf("%s\n", green("Success ✔"))
 
         os.Rename(folder, newFolderName)
 
