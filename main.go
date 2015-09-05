@@ -2,6 +2,7 @@ package main
 
 import (
   "fmt"
+  "flag"
   "os"
   "log"
   "errors"
@@ -92,11 +93,19 @@ func getNewFolderName (m tag.Metadata) (string, error) {
 }
 
 func main () {
+  // Flags
+  dryRun := flag.Bool("dry-run", false, "Do a preview of what will be renamed")
+  flag.Parse()
+
   // Get the folders passed as arguments
-  folders := os.Args[1:]
+  folders := flag.Args()
 
   green := color.New(color.FgGreen).SprintFunc()
   red := color.New(color.FgRed).SprintFunc()
+
+  if (*dryRun == true) {
+    fmt.Println("Running in dry run mode, no renaming will be executed.")
+  }
 
   for _,folder := range folders {
     d := openFolder(folder)
@@ -118,7 +127,10 @@ func main () {
         if err != nil {
           fmt.Printf("%s\n", red("Error: " + err.Error()))
         } else {
-          os.Rename(folder, newFolderName)
+          if (*dryRun == false) {
+            os.Rename(folder, newFolderName)
+          }
+
           fmt.Printf("%s\n", green("Success ✔"))
         }
 
