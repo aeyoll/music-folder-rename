@@ -1,4 +1,4 @@
-package main
+package music_folder_rename
 
 import (
   "fmt"
